@@ -1,14 +1,16 @@
 import tensorflow as tf
 import numpy as np
+from load_fault_data import *
 
-seq_length = 100 # 时序数据的长度
-batch_size = 128 # 批次大小
-latent_dim = 32 # 隐变量向量的大小
-epochs = 10000 # 训练迭代次数
+seq_length = 100  # 时序数据的长度
+batch_size = 128  # 批次大小
+latent_dim = 32  # 隐变量向量的大小
+epochs = 10000  # 训练迭代次数
+
 
 def load_data():
-    data = np.load('data.npy')
-    return data
+    return load_fault_data()
+
 
 # 定义生成器和判别器模型
 def make_generator_model():
@@ -21,6 +23,7 @@ def make_generator_model():
     model.add(tf.keras.layers.LSTM(num_features, return_sequences=True, activation='sigmoid'))
     return model
 
+
 def make_discriminator_model():
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.Input(shape=(seq_length, num_features)))
@@ -30,6 +33,7 @@ def make_discriminator_model():
     model.add(tf.keras.layers.Dense(1, activation='sigmoid'))
     return model
 
+
 # 定义生成器和判别器的优化器
 generator_optimizer = tf.keras.optimizers.Adam(1e-4)
 discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
@@ -37,17 +41,21 @@ discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
 # 定义损失函数和评估指标
 cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 
+
 def discriminator_loss(real_output, fake_output):
     real_loss = cross_entropy(tf.ones_like(real_output), real_output)
     fake_loss = cross_entropy(tf.zeros_like(fake_output), fake_output)
     total_loss = real_loss + fake_loss
     return total_loss
 
+
 def generator_loss(fake_output):
     return cross_entropy(tf.ones_like(fake_output), fake_output)
 
+
 def mean_absolute_error(y_true, y_pred):
     return tf.reduce_mean(tf.abs(y_true - y_pred))
+
 
 # 定义训练步骤
 @tf.function
@@ -76,6 +84,7 @@ def train_step(real_seq):
 
         return gen_loss, disc_loss
 
+
 # 定义数据增强函数
 def generate_samples(model, input_seq, num_samples=1):
     generated_seq = []
@@ -89,6 +98,7 @@ def generate_samples(model, input_seq, num_samples=1):
         generated_seq.append(np.concatenate([input_seq, fake_seq.numpy()], axis=0))
 
     return np.array(generated_seq)
+
 
 # 加载数据集
 data = load_data()
@@ -124,8 +134,3 @@ for epoch in range(epochs):
         print(f"Generated Samples at epoch {epoch + 1}:")
         for i in range(generated_seq.shape[0]):
             print(generated_seq[i])
-
-
-
-
-
