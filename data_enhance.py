@@ -3,7 +3,7 @@ import numpy as np
 import torch
 from load_fault_data import *
 
-seq_length = 5  # 时序数据的长度
+seq_length = 50  # 时序数据的长度
 batch_size = 6  # 批次大小
 latent_dim = 9  # 隐变量向量的大小
 epochs = 10000  # 训练迭代次数
