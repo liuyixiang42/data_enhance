@@ -14,7 +14,7 @@ def load_data():
     data = data[0]
     data = [data] * 6
     data = np.stack(data, axis=0)
-    return torch.from_numpy(data.astype(np.float32))
+    return torch.from_numpy(data)
 
 
 # 定义生成器和判别器模型
@@ -150,7 +150,7 @@ for epoch in range(epochs):
                     ax.set_title("sample")
                     ax.legend()
 
-                # 显示图表
-                plt.show()
+                    # 显示图表
+                    plt.show()
 
 

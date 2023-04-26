@@ -9,20 +9,44 @@ fault_category = ['insulation aging', 'winding fault', 'insulation breakdown', '
                   'cooling fault']
 
 
+def draw_data(fault_data):
+    # 将原始数据长度调整为目标长度的倍数
+    new_fault_data = []
+    length = 50
+    for j in range(6):
+        data = fault_data[j]
+        data = np.repeat(data, length // data.shape[0], axis=0)
+
+        # 线性插值
+        for i in range(data.shape[1]):
+            for t in range(length):
+                t0 = t // 10 * 10
+                t1 = t0 + 10
+                y0 = data[t0 // 10, i]
+                y1 = data[t1 // 10, i]
+                data[t, i] = y0 + (y1 - y0) / 10 * (t - t0)
+        new_fault_data.append(data)
+    new_fault_data = np.array(new_fault_data)
+    return new_fault_data
+
+
 def load_fault_data():
-    data = pd.read_excel('故障样本.xlsx', usecols=column)
+    fault_data = pd.read_excel('故障样本.xlsx', usecols=column)
 
-    data.dropna(inplace=True)
+    fault_data.dropna(inplace=True)
 
-    data = data.values
+    fault_data = fault_data.values
 
-    data = data[:173, :]
+    fault_data = fault_data[:173, :]
 
     rows_to_delete = [144, 115, 86, 57, 28]
-    data = np.delete(data, rows_to_delete, axis=0)
-    data = data.reshape(6, 28, 9)
-    data = data[:, 23:, :]
-    return data
+    fault_data = np.delete(fault_data, rows_to_delete, axis=0)
+    fault_data = fault_data.reshape(6, 28, 9)
+    fault_data = fault_data[:, 23:, :]
+    fault_data = fault_data.astype(np.float64)
+
+    return draw_data(fault_data)
+    # return fault_data
 
 
 if __name__ == '__main__':
