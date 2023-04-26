@@ -10,7 +10,7 @@ fault_category = ['insulation aging', 'winding fault', 'insulation breakdown', '
 
 
 def load_fault_data():
-    data = pd.read_excel('故障样本.xlsx', usecols=column)
+    data = pd.read_excel('fault data.xlsx', usecols=column)
 
     data.dropna(inplace=True)
 
@@ -24,7 +24,7 @@ def load_fault_data():
     return data
 
 
-if __name__ == 'main':
+if __name__ == '__main__':
     data = load_fault_data()
     for j in range(6):
         # 创建图表对象
