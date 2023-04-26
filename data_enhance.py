@@ -1,15 +1,20 @@
 import tensorflow as tf
 import numpy as np
+import torch
 from load_fault_data import *
 
-seq_length = 100  # 时序数据的长度
-batch_size = 128  # 批次大小
-latent_dim = 32  # 隐变量向量的大小
+seq_length = 5  # 时序数据的长度
+batch_size = 6  # 批次大小
+latent_dim = 9  # 隐变量向量的大小
 epochs = 10000  # 训练迭代次数
 
 
 def load_data():
-    return load_fault_data()
+    data = load_fault_data()
+    data = data[0]
+    data = [data] * 6
+    data = np.stack(data, axis=0)
+    return torch.from_numpy(data.astype(np.float32))
 
 
 # 定义生成器和判别器模型
@@ -134,3 +139,18 @@ for epoch in range(epochs):
         print(f"Generated Samples at epoch {epoch + 1}:")
         for i in range(generated_seq.shape[0]):
             print(generated_seq[i])
+            if epoch + 1 == 10000:
+                for k in range(2):
+                    data = np.array(generated_seq[i][k])
+                    fig, ax = plt.subplots()
+                    for j in range(9):
+                        ax.plot(data[:, j], label=labels[j])
+                    ax.set_xlabel("date/d")
+                    ax.set_ylabel("concentration/ppm")
+                    ax.set_title("sample")
+                    ax.legend()
+
+                # 显示图表
+                plt.show()
+
+

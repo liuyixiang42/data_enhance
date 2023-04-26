@@ -10,7 +10,7 @@ fault_category = ['insulation aging', 'winding fault', 'insulation breakdown', '
 
 
 def load_fault_data():
-    data = pd.read_excel('fault data.xlsx', usecols=column)
+    data = pd.read_excel('故障样本.xlsx', usecols=column)
 
     data.dropna(inplace=True)
 
@@ -21,6 +21,7 @@ def load_fault_data():
     rows_to_delete = [144, 115, 86, 57, 28]
     data = np.delete(data, rows_to_delete, axis=0)
     data = data.reshape(6, 28, 9)
+    data = data[:, 23:, :]
     return data
 
 
