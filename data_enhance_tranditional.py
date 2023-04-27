@@ -3,15 +3,17 @@ import random
 import matplotlib.pyplot as plt
 from load_fault_data import *
 
-add_noise_level = [2, 2, 1.7, 0.5, 0, 1.4, 4, 5, 2]
-frequency_noise_levels = [15, 15, 13, 7, 0, 10, 36, 50, 45]
+add_noise_level = [1, 1, 0.8, 0.2, 0, 0.5, 1.5, 1.6, 1.1]
+frequency_noise_levels = [7, 7, 5, 2, 0, 3, 14, 15, 11]
+
+noise_factor = [8, 7, 6, 1, 1, 4, 10, 25, 60]
 
 time_scale_typy = {'forward': 0, 'backward': 1}
 
 
 # 生成多参量时序数据
 def generate_data():
-    return load_fault_data()[0]
+    return load_fault_data()[[0, 4]]
 
 
 def plt_data(data):
@@ -34,7 +36,15 @@ def add_noise(data):
     # 根据不同油气和油温的变化幅度采用不同的noise_level
     for i in range(9):
         noise = np.random.normal(0, add_noise_level[i], len(data))
+        factor = data[:, i] / noise_factor[i]
+        for j in range(len(factor)):
+            if factor[j] > 2.5:
+                factor[j] = 2.5
+        noise = factor * noise
         noisy_data[:, i] = data[:, i] + noise
+
+    # 将负值替换成0
+    noisy_data[noisy_data < 0] = 0
     return noisy_data
 
 
@@ -43,13 +53,21 @@ def add_frequency_noise(data):
     freq_data = np.fft.fft(data, axis=0)
     # 增加噪声
     noise = np.zeros_like(freq_data)
-    for i in range(data.shape[1] - 1):
+    for i in range(data.shape[1]):
         noise[:, i] = np.random.normal(scale=frequency_noise_levels[i], size=freq_data.shape[0])
-    # 对最后一个维度油温不加噪声
+        factor = data[:, i] / noise_factor[i]
+        for j in range(len(factor)):
+            if factor[j] > 2.9:
+                factor[j] = 2.9
+        noise[:, i] = noise[:, i] * factor
+
     freq_data += noise
     # 将数据转换回时域
-    return np.fft.ifft(freq_data, axis=0).real
+    noisy_data = np.fft.ifft(freq_data, axis=0).real
 
+    # 将负值替换成0
+    noisy_data[noisy_data < 0] = 0
+    return noisy_data
 
 def time_scale(data):
     type = np.random.randint(0, 2)
@@ -69,13 +87,24 @@ def time_scale(data):
 
 
 data = generate_data()
-plt_data(data)
 
-noisy_data = add_noise(data)
-plt_data(noisy_data)
 
-f_data = add_frequency_noise(data)
-plt_data(f_data)
 
-time_scaled_data = time_scale(data)
-plt_data(time_scaled_data)
+for i in range(2):
+    plt_data(data[i])
+
+    noisy_data = add_noise(data[i])
+    plt_data(noisy_data)
+
+    f_data = add_frequency_noise(data[i])
+    plt_data(f_data)
+
+    time_scaled_data = time_scale(data[i])
+    plt_data(time_scaled_data)
+
+    tmp_data = time_scale(data[i])
+    tmp_data = add_noise(tmp_data)
+    tmp_data = add_frequency_noise(tmp_data)
+    plt_data(tmp_data)
+
+
