@@ -9,8 +9,8 @@ def normalize3(a):
     return a
 
 
-data = load_fault_data()
-# data = normalize3(data)
+data = load_fault_data_gmm()
+data = normalize3(data)
 # 转换为二维数组
 data2d = data.reshape(-1, 9)
 
@@ -25,6 +25,8 @@ labels = gmm.predict(data2d)
 
 # 将标签转换为三维数组形式
 labels3d = labels.reshape(data.shape[0], data.shape[1])
+
+labels_final = np.apply_along_axis(lambda x: np.bincount(x).argmax(), axis=1, arr=labels3d)
 
 # 输出聚类结果
 for i in range(4):

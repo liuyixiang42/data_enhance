@@ -65,6 +65,24 @@ def load_fault_data():
     return draw_data(fault_data, 50)
 
 
+def load_fault_data_gmm():
+    fault_data = pd.read_excel('故障样本.xlsx', usecols=column)
+
+    fault_data.dropna(inplace=True)
+
+    fault_data = fault_data.values
+
+    fault_data = fault_data[:191, :]
+
+    rows_to_delete = [159, 127, 95, 63, 31]
+    fault_data = np.delete(fault_data, rows_to_delete, axis=0)
+    fault_data = fault_data.reshape(6, 31, 9)
+    fault_data = fault_data[:, 22:28, :]
+    fault_data = fault_data.astype(np.float64)
+
+    return draw_data(fault_data, 60)
+
+
 if __name__ == '__main__':
     data = load_fault_data()
     for j in range(6):
