@@ -80,7 +80,7 @@ def load_fault_data_gmm():
     fault_data = fault_data[:, 22:28, :]
     fault_data = fault_data.astype(np.float64)
 
-    return draw_data(fault_data, 60)
+    return draw_data(fault_data, 50)
 
 
 if __name__ == '__main__':

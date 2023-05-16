@@ -1,6 +1,8 @@
 from sklearn.preprocessing import MinMaxScaler
 from load_fault_data import *
 from sklearn.mixture import GaussianMixture
+from data_enhance_tranditional import *
+import time
 
 def normalize3(a):
     for i in range(a.shape[0]):
@@ -8,17 +10,31 @@ def normalize3(a):
         a[i] = (a[i] - min_a) / (max_a - min_a + 0.00001)
     return a
 
+def enhance(data):
+    enhance_data = []
+    for i in range(5):
+        for d in data:
+            enhance_data.append(add_frequency_noise(d))
+    return np.array(enhance_data)
+
+
+
 
 data = load_fault_data_gmm()
-data = normalize3(data)
+data = enhance(data)
+# data = normalize3(data)
 # 转换为二维数组
 data2d = data.reshape(-1, 9)
 
 # 创建高斯混合模型对象，设置聚类数量为 4
-gmm = GaussianMixture(n_components=6)
+gmm = GaussianMixture(n_components=6, max_iter=5000)
 
+start_time = time.time()
 # 训练模型
 gmm.fit(data2d)
+
+end_time = time.time()
+training_time = end_time - start_time
 
 # 预测聚类标签
 labels = gmm.predict(data2d)
