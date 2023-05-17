@@ -29,12 +29,8 @@ data2d = data.reshape(-1, 9)
 # 创建高斯混合模型对象，设置聚类数量为 4
 gmm = GaussianMixture(n_components=6, max_iter=5000)
 
-start_time = time.time()
 # 训练模型
 gmm.fit(data2d)
-
-end_time = time.time()
-training_time = end_time - start_time
 
 # 预测聚类标签
 labels = gmm.predict(data2d)
